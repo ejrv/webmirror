@@ -1,0 +1,48 @@
+name: webmirror
+
+on:
+  workflow_dispatch:
+    inputs:
+      website_url:
+        description: 'URL of the website to mirror'
+        required: true
+        default: 'https://example.com'
+      output_dir:
+        description: 'Directory to save the mirrored site'
+        required: false
+        default: './mirrored_site'
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install wget
+        run: sudo apt-get update && sudo apt-get install -y wget
+
+      - name: Mirror website
+        run: |
+          wget \
+            --mirror \
+            --convert-links \
+            --adjust-extension \
+            --page-requisites \
+            --no-parent \
+            --directory-prefix=${{ inputs.output_dir }} \
+            ${{ inputs.website_url }}
+
+      - name: Upload mirrored site as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mirrored-website
+          path: ${{ inputs.output_dir }}
+
+      # Optional: Commit and push the mirrored site to another branch/repo
+      # - name: Commit and push mirrored site
+      #   uses: ad-m/github-push-action@master
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     branch: mirrored-${{ github.run_number }}
+      #     directory: ${{ inputs.output_dir }}
