@@ -10,7 +10,7 @@ on:
       output_dir:
         description: 'Directory to save the mirrored site'
         required: true
-        default: '/mirrored'
+        default: './mirrored/my/'
 
 jobs:
   mirror:
